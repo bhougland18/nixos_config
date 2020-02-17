@@ -4,10 +4,19 @@
 
 { config, pkgs, ... }:
 
-{
-  imports =
+  let
+    unstableTarball =
+      fetchTarball
+        https://github.com/NixOS/nixpkgs-channels/archive/nixos-unstable.tar.gz;
+
+
+  in 
+  {
+    imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      # add home-manager in an updated fashion
+      "${builtins.fetchTarball https://github.com/rycee/home-manager/archive/release-19.09.tar.gz}/nixos"
     ];
 
   # Use the systemd-boot EFI boot loader.
@@ -41,7 +50,14 @@
   # Set your time zone.
   time.timeZone = "US/Eastern";
 
-  nixpkgs.config.allowUnfree = true;  
+  nixpkgs.config = {
+    packageOverrides = pkgs: {
+      unstable = import unstableTarball {
+        config = config.nixpkgs.config;
+      };
+    };
+    allowUnfree = true;  
+  };
   
   fonts.fonts = with pkgs; [
     fira-code
@@ -49,7 +65,6 @@
     cooper-hewitt
     ibm-plex
     fira-code-symbols
-    nerdfonts
     powerline-fonts
   ];
 
@@ -95,13 +110,14 @@
      aspellDicts.en
      aspellDicts.en-computers
      chezmoi #dotfiles manager
-
+     neovim
 
      #Shells
      starship
      fish
      any-nix-shell
      powerline-go
+     unstable.nushell
 
      #asciidoctor publishing
      #asciidoctorj #only on unstable chanell
@@ -127,7 +143,11 @@
      gitg
      planner
      firefox
+     unstable.spotify
+     unstable.wpsoffice
      mousetweaks
+    
+     # Gnome desktop
      gnome3.gnome-boxes
      gnome3.polari
      gnome3.dconf-editor
@@ -135,11 +155,8 @@
      gnomeExtensions.impatience
      gnomeExtensions.dash-to-dock
      gnomeExtensions.dash-to-panel
-     gnomeExtensions.clipboard-indicator
-     #  gnomeExtensions.tilingnome #broken
-     gnomeExtensions.timepp
+     unstable.gnomeExtensions.tilingnome #broken
      gnomeExtensions.system-monitor
-    
      
      
      #themes
