@@ -26,7 +26,7 @@
   boot.supportedFilesystems = ["zfs"];
   boot.zfs.requestEncryptionCredentials = true;
 
-  networking.hostId = "238330f5";
+  networking.hostId = "cda96004";
   # networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
@@ -78,10 +78,12 @@
 
     etc = with pkgs; {
       "jdk11".source = jdk11;
+      "jetbrains.jdk".source = jetbrains.jdk;
+      "openjfx11".source = openjfx11;
     };
 
     variables = {
-      EDITOR = pkgs.lib.mkOverride 0 "vim";
+      EDITOR = pkgs.lib.mkOverride 0 "myvim";
       BROWSER = pkgs.lib.mkOverride 0 "chromium";
     };
   
@@ -94,7 +96,6 @@
      tree
      mkpasswd
      wget
-     vim
      xorg.xkill
      ripgrep-all
      visidata
@@ -104,6 +105,8 @@
      exa
      pandoc
      jdk11
+     openjfx11
+     jetbrains.jdk
      direnv
      emacs
      aspell #used by flyspell in spacemacs
@@ -111,6 +114,11 @@
      aspellDicts.en-computers
      chezmoi #dotfiles manager
      neovim
+     entr
+     modd
+     devd
+     notify-desktop
+     xclip
 
      #Shells
      starship
@@ -120,7 +128,7 @@
      unstable.nushell
 
      #asciidoctor publishing
-     #asciidoctorj #only on unstable chanell
+     unstable.asciidoctorj #only on unstable chanell
      graphviz
      compass
      pandoc
@@ -139,14 +147,15 @@
      unetbootin
      visidata
      vscodium
-     jetbrains.idea-community
      gitg
      planner
      firefox
      unstable.spotify
      unstable.wpsoffice
      mousetweaks
-    
+     unclutter
+     unstable.jetbrains.idea-community
+ 
      # Gnome desktop
      gnome3.gnome-boxes
      gnome3.polari
@@ -160,6 +169,9 @@
      
      
      #themes
+     numix-cursor-theme
+     bibata-cursors
+     vanilla-dmz
      capitaine-cursors
      equilux-theme
      materia-theme
@@ -179,6 +191,40 @@
 
      #Python
      python38Full
+
+     (vim_configurable.customize {
+       name = "myvim";
+       vimrcConfig.customRC = ''
+	 set number relativenumber
+	 syntax enable
+	 filetype plugin indent on
+         colorscheme OceanicNext
+         autocmd FileType nix :packadd vim-nix
+	 autocmd FileType fish :packadd vim-fish
+
+         vnoremap <C-C> "+y
+         vnoremap <S-Insert> "+y
+         vnoremap <C-X> "+x
+         vnoremap <S-Del> "+x
+         map <C-V> "+gP
+         map <S-Insert> "+gP
+         cmap <C-V> <C-R>+
+         cmap <S-Insert> <C-R>+
+        '';
+
+       vimrcConfig.packages.myVimPackage = with vimPlugins; {
+         start = [];
+         opt = [
+           vim-nix
+           vim-fish
+           awesome-vim-colorschemes
+            ];
+	# loaded on lauch
+	};
+       # add custom .vimrc lines like this:
+        
+     })
+
 
    ];
   };
