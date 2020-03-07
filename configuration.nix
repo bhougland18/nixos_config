@@ -80,7 +80,35 @@
       "jdk11".source = jdk11;
       "jetbrains.jdk".source = jetbrains.jdk;
       "openjfx11".source = openjfx11;
-    };
+      "containers/policy.json" = {
+          mode="0644";
+          text=''
+            {   
+              "default": [
+                {
+                  "type": "insecureAcceptAnything"
+                }
+               ],
+              "transports":
+                {
+                  "docker-daemon":
+                    {
+                      "": [{"type":"insecureAcceptAnything"}]
+                    }
+                }
+            }
+          '';
+        };
+
+      "containers/registries.conf" = {
+          mode="0644";
+          text=''
+            [registries.search]
+            registries = ['docker.io', 'quay.io']
+          '';
+        };
+      };
+
 
     variables = {
       EDITOR = pkgs.lib.mkOverride 0 "myvim";
@@ -119,6 +147,17 @@
      devd
      notify-desktop
      xclip
+     exercism
+     tmux
+     tmuxp
+
+     #Containers
+     podman
+     buildah
+     conmon
+     runc
+     slirp4netns
+     fuse-overlayfs
 
      #Shells
      starship
@@ -126,6 +165,7 @@
      any-nix-shell
      powerline-go
      unstable.nushell
+     any-nix-shell
 
      #asciidoctor publishing
      unstable.asciidoctorj #only on unstable chanell
@@ -155,7 +195,9 @@
      mousetweaks
      unclutter
      unstable.jetbrains.idea-community
- 
+     pithos
+     virtmanager
+
      # Gnome desktop
      gnome3.gnome-boxes
      gnome3.polari
@@ -171,7 +213,6 @@
      #themes
      numix-cursor-theme
      bibata-cursors
-     vanilla-dmz
      capitaine-cursors
      equilux-theme
      materia-theme
@@ -234,7 +275,9 @@
   # programs.mtr.enable = true;
   # programs.gnupg.agent = { enable = true; enableSSHSupport = true; };
   programs.fish.enable = true;
-  programs.zsh.enable = true;
+  programs.fish.promptInit = ''
+    any-nix-shell fish --info-right | source
+  '';
 
   # List services that you want to enable:
 
@@ -244,7 +287,8 @@
   # ZFS services
   services.zfs.autoSnapshot.enable = true;
   services.zfs.autoScrub.enable = true;
-
+  services.zfs.trim.enable = true;
+  
   # To use Lorri for development
   services.lorri.enable = true; 
 
@@ -285,6 +329,8 @@
   users.users.ben = {
      isNormalUser = true;
      shell = pkgs.fish;
+     subUidRanges = [{ startUid = 100000; count = 65536; }]; #for podman containers
+     subGidRanges = [{ startGid = 100000; count = 65536; }];
      extraGroups = [ "wheel" "video" "audio" "disk" "networkmanager" ]; 
      hashedPassword = "$6$HMYj5tELGpDcdZS$IFHdcaE4c0/eoCIzaqa1EFrVqmjCZ9MFod2g3uciaFH44pa6crmmQRoz4kgRVoJ0pjJrfNer2BRwaICMrhxpE0";
      uid = 1000;
