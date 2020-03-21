@@ -67,6 +67,18 @@
     fira-code-symbols
     powerline-fonts
   ];
+  
+  nixpkgs.overlays = [
+    (self: super: {
+      kakoune = super.wrapKakoune self.kakoune-unwrapped {
+        configure = {
+          plugins = with self.kakounePlugins; [
+            parinfer-rust
+          ];
+        };
+      };
+    })
+   ];
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -74,11 +86,15 @@
     shells = [
       "${pkgs.bash}/bin/bash"
       "${pkgs.fish}/bin/fish"
+     # "${pkgs.unstable.nushell}/bin/nu"
     ];
+ 
+
+     
+
 
     etc = with pkgs; {
       "jdk11".source = jdk11;
-      "jetbrains.jdk".source = jetbrains.jdk;
       "openjfx11".source = openjfx11;
       "containers/policy.json" = {
           mode="0644";
@@ -111,7 +127,7 @@
 
 
     variables = {
-      EDITOR = pkgs.lib.mkOverride 0 "myvim";
+      EDITOR = pkgs.lib.mkOverride 0 "kak";
       BROWSER = pkgs.lib.mkOverride 0 "chromium";
     };
   
@@ -130,18 +146,15 @@
      youtube-dl
      chromedriver
      geckodriver
-     exa
      pandoc
      jdk11
      openjfx11
-     jetbrains.jdk
      direnv
      emacs
      aspell #used by flyspell in spacemacs
      aspellDicts.en
      aspellDicts.en-computers
      chezmoi #dotfiles manager
-     neovim
      entr
      modd
      devd
@@ -150,22 +163,39 @@
      exercism
      tmux
      tmuxp
+     kakoune
+     kitty
+     taskwarrior
+     tasknc
+     nnn
+     nq     
+     fpp #facebook filepicker
+     rofi
+
+     #Rust CLI
+     pazi # autojump
+     exa #better ls
+     skim # fuzzy finder
+
+     #NIX tools
+     nixpkgs-lint
+     nixpkgs-fmt
+     nixfmt
 
      #Containers
-     podman
-     buildah
-     conmon
-     runc
-     slirp4netns
-     fuse-overlayfs
+     unstable.podman
+     unstable.buildah
+     unstable.conmon
+     unstable.runc
+     unstable.slirp4netns
+     unstable.fuse-overlayfs
 
      #Shells
      starship
      fish
      any-nix-shell
-     powerline-go
      unstable.nushell
-     any-nix-shell
+     elvish
 
      #asciidoctor publishing
      unstable.asciidoctorj #only on unstable chanell
@@ -175,27 +205,21 @@
      ditaa
 
      #GUI Apps
-     tilix
      chromium
      dbeaver
      slack
      fondo
-     calibre
      torrential
      vocal
      lollypop
      unetbootin
-     visidata
      vscodium
      gitg
-     planner
      firefox
-     unstable.spotify
      unstable.wpsoffice
-     mousetweaks
      unclutter
-     unstable.jetbrains.idea-community
      pithos
+     joplin-desktop
      virtmanager
 
      # Gnome desktop
@@ -208,7 +232,6 @@
      gnomeExtensions.dash-to-panel
      unstable.gnomeExtensions.tilingnome #broken
      gnomeExtensions.system-monitor
-     
      
      #themes
      numix-cursor-theme
@@ -223,23 +246,27 @@
      papirus-icon-theme
      plata-theme
      sierra-gtk-theme
-     solarc-gtk-theme     
 
      #Clojure
      clojure
      clj-kondo
      leiningen
+     boot
+     parinfer-rust
+     unstable.clojure-lsp
 
      #Python
      python38Full
 
      (vim_configurable.customize {
-       name = "myvim";
+       name = "nvim";
        vimrcConfig.customRC = ''
 	 set number relativenumber
 	 syntax enable
-	 filetype plugin indent on
-         colorscheme OceanicNext
+         filetype plugin indent on
+         set bg=dark
+         colorscheme gruvbox
+
          autocmd FileType nix :packadd vim-nix
 	 autocmd FileType fish :packadd vim-fish
 
@@ -265,6 +292,9 @@
        # add custom .vimrc lines like this:
         
      })
+
+    
+
 
 
    ];
@@ -328,7 +358,7 @@
   users.mutableUsers = false;
   users.users.ben = {
      isNormalUser = true;
-     shell = pkgs.fish;
+     #shell = pkgs.fish;
      subUidRanges = [{ startUid = 100000; count = 65536; }]; #for podman containers
      subGidRanges = [{ startGid = 100000; count = 65536; }];
      extraGroups = [ "wheel" "video" "audio" "disk" "networkmanager" ]; 
