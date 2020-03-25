@@ -74,6 +74,7 @@
         configure = {
           plugins = with self.kakounePlugins; [
             parinfer-rust
+            #unstable.kak-lsp
           ];
         };
       };
@@ -85,7 +86,8 @@
   environment = {
     shells = [
       "${pkgs.bash}/bin/bash"
-      "${pkgs.fish}/bin/fish"
+     # "${pkgs.fish}/bin/fish"
+      "${pkgs.zsh}/bin/zsh"
      # "${pkgs.unstable.nushell}/bin/nu"
     ];
  
@@ -136,8 +138,8 @@
      #Commandline tools
      coreutils
      gitAndTools.gitFull
+     gitAndTools.grv
      man
-     tree
      mkpasswd
      wget
      xorg.xkill
@@ -161,22 +163,30 @@
      notify-desktop
      xclip
      exercism
-     tmux
-     tmuxp
      kakoune
-     kitty
+     unstable.kak-lsp
+     unstable.kitty
      taskwarrior
      tasknc
      nnn
      nq     
      fpp #facebook filepicker
      rofi
-
-     #Rust CLI
+     fff
+     taskell
+     trash-cli
+     bat
+     unstable.tre
+     corgi
+     fzf
+     apparix #cli bookmarks
      pazi # autojump
      exa #better ls
      skim # fuzzy finder
-
+     jq
+     yq-go
+     ncurses
+     
      #NIX tools
      nixpkgs-lint
      nixpkgs-fmt
@@ -192,10 +202,11 @@
 
      #Shells
      starship
-     fish
+     #fish
      any-nix-shell
      unstable.nushell
-     elvish
+     zsh
+     zsh-autosuggestions
 
      #asciidoctor publishing
      unstable.asciidoctorj #only on unstable chanell
@@ -221,6 +232,9 @@
      pithos
      joplin-desktop
      virtmanager
+     inkscape
+     calibre
+     gcolor3
 
      # Gnome desktop
      gnome3.gnome-boxes
@@ -304,6 +318,12 @@
   # started in user sessions.
   # programs.mtr.enable = true;
   # programs.gnupg.agent = { enable = true; enableSSHSupport = true; };
+  # Enable zsh
+  programs.zsh.enable = true;
+  programs.zsh.ohMyZsh = {
+    enable = true;
+    plugins = [ "git" "sudo" ];
+  };
   programs.fish.enable = true;
   programs.fish.promptInit = ''
     any-nix-shell fish --info-right | source
