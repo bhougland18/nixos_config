@@ -86,14 +86,10 @@
   environment = {
     shells = [
       "${pkgs.bash}/bin/bash"
-     # "${pkgs.fish}/bin/fish"
       "${pkgs.zsh}/bin/zsh"
      # "${pkgs.unstable.nushell}/bin/nu"
     ];
  
-
-     
-
 
     etc = with pkgs; {
       "jdk11".source = jdk11;
@@ -131,6 +127,7 @@
     variables = {
       EDITOR = pkgs.lib.mkOverride 0 "kak";
       BROWSER = pkgs.lib.mkOverride 0 "chromium";
+      TERMINAL = pkgs.lib.mkOverride 0 "kitty";	
     };
   
     systemPackages = with pkgs; [
@@ -185,7 +182,10 @@
      skim # fuzzy finder
      jq
      yq-go
-     ncurses
+     unstable.ncurses
+     unstable.tre-command
+     unstable.tree-sitter
+     surf
      
      #NIX tools
      nixpkgs-lint
@@ -202,11 +202,12 @@
 
      #Shells
      starship
-     #fish
      any-nix-shell
      unstable.nushell
+     #zsh Tools
      zsh
      zsh-autosuggestions
+     nix-zsh-completions
 
      #asciidoctor publishing
      unstable.asciidoctorj #only on unstable chanell
@@ -234,7 +235,6 @@
      virtmanager
      inkscape
      calibre
-     gcolor3
 
      # Gnome desktop
      gnome3.gnome-boxes
@@ -271,46 +271,6 @@
 
      #Python
      python38Full
-
-     (vim_configurable.customize {
-       name = "nvim";
-       vimrcConfig.customRC = ''
-	 set number relativenumber
-	 syntax enable
-         filetype plugin indent on
-         set bg=dark
-         colorscheme gruvbox
-
-         autocmd FileType nix :packadd vim-nix
-	 autocmd FileType fish :packadd vim-fish
-
-         vnoremap <C-C> "+y
-         vnoremap <S-Insert> "+y
-         vnoremap <C-X> "+x
-         vnoremap <S-Del> "+x
-         map <C-V> "+gP
-         map <S-Insert> "+gP
-         cmap <C-V> <C-R>+
-         cmap <S-Insert> <C-R>+
-        '';
-
-       vimrcConfig.packages.myVimPackage = with vimPlugins; {
-         start = [];
-         opt = [
-           vim-nix
-           vim-fish
-           awesome-vim-colorschemes
-            ];
-	# loaded on lauch
-	};
-       # add custom .vimrc lines like this:
-        
-     })
-
-    
-
-
-
    ];
   };
 
@@ -319,15 +279,15 @@
   # programs.mtr.enable = true;
   # programs.gnupg.agent = { enable = true; enableSSHSupport = true; };
   # Enable zsh
-  programs.zsh.enable = true;
-  programs.zsh.ohMyZsh = {
+  programs.zsh = {
     enable = true;
-    plugins = [ "git" "sudo" ];
+    enableAutosuggestions = true;
+    syntaxHighlighting.enable = true;
+    ohMyZsh = {
+      enable = true;
+      plugins = [ "git" "sudo" ];
+    };
   };
-  programs.fish.enable = true;
-  programs.fish.promptInit = ''
-    any-nix-shell fish --info-right | source
-  '';
 
   # List services that you want to enable:
 
@@ -366,10 +326,6 @@
   # Enable touchpad support.
    services.xserver.libinput.enable = true;
 
-  # Enable the KDE Desktop Environment.
-  # services.xserver.displayManager.sddm.enable = true;
-  # services.xserver.desktopManager.plasma5.enable = true;
-
   # Enable Gnome desktop Environment
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome3.enable = true;
@@ -378,7 +334,7 @@
   users.mutableUsers = false;
   users.users.ben = {
      isNormalUser = true;
-     #shell = pkgs.fish;
+     shell = pkgs.zsh;
      subUidRanges = [{ startUid = 100000; count = 65536; }]; #for podman containers
      subGidRanges = [{ startGid = 100000; count = 65536; }];
      extraGroups = [ "wheel" "video" "audio" "disk" "networkmanager" ]; 
