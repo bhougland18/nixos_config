@@ -319,7 +319,7 @@ To make the next steps easier to understand lets again make some variables:
 ----
 BOOT=$DISK-part1
 
-SWAP = $DISK-part2
+SWAP=$DISK-part2
 
 ZFS=$DISK-part3
 ----
@@ -489,7 +489,7 @@ mount $BOOT /mnt/boot
 [INFORMATION]
 .command : make swap
 ----
-mkswap -U swap $SWAP
+mkswap -L swap $SWAP
 ----
 
 
