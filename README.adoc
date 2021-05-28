@@ -543,7 +543,7 @@ Lets open the hardware-configuration.nix file and see what we have.
 [INFORMATION]
 .command: open hardware-configuration file
 ....
-nano /mnt/etc/hardware-configuration.nix
+nano /mnt/etc/nixos/hardware-configuration.nix
 ....
 
 [INFORMATION]
